@@ -32,10 +32,13 @@
             <span class="px-2.5 py-1 text-xs font-mono bg-slate-800 text-slate-300 border border-slate-700 rounded-full">
               Live Database: 45 Projects
             </span>
+            <button onclick="openPromptModal('all')" class="px-2.5 py-1 text-xs font-medium bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 rounded-full flex items-center gap-1 transition">
+              <span>🤖 Export AI Prompt</span>
+            </button>
           </div>
           <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white flex items-center gap-3">
             <span>Self-Locally</span>
-            <span class="text-emerald-400 text-2xl font-mono font-normal">v1.1</span>
+            <span class="text-emerald-400 text-2xl font-mono font-normal">v1.2</span>
           </h1>
           <p class="text-slate-400 text-sm sm:text-base mt-2 max-w-3xl leading-relaxed">
             The curated directory of self-hosting projects that satisfy the strict 4-point lean VPS criteria:
@@ -76,9 +79,14 @@
           <span class="text-slate-300 underline decoration-slate-600">2. Multi-device sync</span> &bull;
           <span class="text-slate-300 underline decoration-slate-600">3. Family/Team hosting</span>
         </div>
-        <button id="toggle-manifesto-btn" onclick="toggleManifesto()" class="text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-1 transition">
-          <span id="manifesto-btn-text">Read Philosophy & 3 Diseases</span> &darr;
-        </button>
+        <div class="flex items-center gap-3">
+          <button onclick="openPromptModal('bundle')" class="text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1 transition">
+            <span>Export Prompt for AI Agent</span> &rarr;
+          </button>
+          <button id="toggle-manifesto-btn" onclick="toggleManifesto()" class="text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-1 transition">
+            <span id="manifesto-btn-text">Read Philosophy & 3 Diseases</span> &darr;
+          </button>
+        </div>
       </div>
 
       <!-- EXPANDABLE PHILOSOPHY DRAWER -->
@@ -199,6 +207,11 @@
             <option value="category">Category</option>
           </select>
 
+          <!-- Export Prompt Button -->
+          <button onclick="openPromptModal('filtered')" class="px-3 py-2 bg-indigo-600/90 hover:bg-indigo-500 text-white text-xs rounded-xl font-medium transition flex items-center gap-1.5 shadow-md whitespace-nowrap ml-1">
+            <span>🤖 Export Prompt</span>
+          </button>
+
           <!-- View toggle -->
           <div class="flex items-center border border-slate-800 bg-slate-900 rounded-lg p-0.5 ml-2">
             <button id="view-cards-btn" onclick="setViewMode('cards')" class="px-2.5 py-1 text-xs rounded bg-slate-800 text-emerald-400 font-medium transition">Cards</button>
@@ -295,7 +308,7 @@
             <span class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Live Calculator</span>
           </h2>
           <p class="text-xs sm:text-sm text-slate-400 mt-1">
-            Select projects above to calculate your total memory/disk footprint and generate a single 1-command startup script.
+            Select projects above to calculate your total memory/disk footprint, generate a shell script, or export an AI setup prompt.
           </p>
         </div>
 
@@ -342,11 +355,16 @@
 
       <!-- GENERATED ONE-LINER OR COMPOSE -->
       <div class="space-y-2">
-        <div class="flex items-center justify-between text-xs">
+        <div class="flex items-center justify-between text-xs flex-wrap gap-2">
           <span class="text-slate-300 font-semibold">Unified 1-Command Multi-Container Launch Script:</span>
-          <button onclick="copyBundleScript(this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded text-xs transition">
-            Copy Deploy Command
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="copyBundleScript(this)" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded text-xs transition">
+              Copy Deploy Script
+            </button>
+            <button onclick="openPromptModal('bundle')" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded text-xs transition flex items-center gap-1.5 shadow">
+              <span>🤖 Export as AI Prompt</span>
+            </button>
+          </div>
         </div>
         <pre id="bundle-code" class="p-4 bg-slate-950 border border-slate-800 rounded-xl text-emerald-400 text-xs font-mono overflow-x-auto whitespace-pre leading-relaxed"># Check services in the cards above to generate a unified 1-command startup script!</pre>
       </div>
@@ -511,6 +529,113 @@
 
   </div>
 
+  <!-- MODAL: EXPORT AS AI PROMPT -->
+  <div id="prompt-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-sm hidden">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/50">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 text-[11px] font-mono rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold">AI PROMPT EXPORTER</span>
+            <span id="prompt-modal-service-count" class="text-xs font-mono text-emerald-400 font-bold">5 Services</span>
+          </div>
+          <h3 class="text-lg font-bold text-white mt-1">Export Self-Locally Stack as AI Agent Prompt</h3>
+          <p class="text-xs text-slate-400">Paste this prompt into Claude, Gemini, ChatGPT, Codex, or Antigravity to autonomously install and configure your stack.</p>
+        </div>
+        <button onclick="closePromptModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- Modal Body (Controls & Preview) -->
+      <div class="p-5 overflow-y-auto space-y-4 text-xs">
+        
+        <!-- Configuration Controls Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-950 p-4 rounded-xl border border-slate-800">
+          <!-- 1. Scope Selection -->
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Export Scope:</label>
+            <select id="prompt-scope" onchange="updateGeneratedPrompt()" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 font-mono">
+              <option value="bundle">Selected Bundle (Checkbox Items)</option>
+              <option value="filtered">Currently Filtered Results</option>
+              <option value="all">All 45 Projects (Complete Index)</option>
+            </select>
+          </div>
+
+          <!-- 2. Target OS -->
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Target Operating System:</label>
+            <select id="prompt-os" onchange="updateGeneratedPrompt()" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 font-mono">
+              <option value="Debian/Ubuntu">Debian / Ubuntu VPS</option>
+              <option value="Gentoo Linux">Gentoo Linux (Disease #1 Spec)</option>
+              <option value="Arch Linux">Arch Linux</option>
+              <option value="Alpine/LXC">Alpine Linux / Proxmox LXC</option>
+            </select>
+          </div>
+
+          <!-- 3. Deployment Style -->
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Deploy Flavor:</label>
+            <select id="prompt-flavor" onchange="updateGeneratedPrompt()" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-slate-200 text-xs focus:outline-none focus:border-indigo-500 font-mono">
+              <option value="docker">Docker Containers (Standard)</option>
+              <option value="compose">Single Docker Compose File</option>
+              <option value="binary">Native Static Binaries &amp; Systemd</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Optional Directives Checkboxes -->
+        <div class="flex items-center gap-4 flex-wrap bg-slate-950/60 p-3 rounded-lg border border-slate-800/80 text-[11px] text-slate-300">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="prompt-opt-health" checked onchange="updateGeneratedPrompt()" class="accent-indigo-500">
+            <span>Include automated curl health-checks</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="prompt-opt-proxy" checked onchange="updateGeneratedPrompt()" class="accent-indigo-500">
+            <span>Include Caddy reverse-proxy / auto-TLS directives</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="checkbox" id="prompt-opt-firewall" checked onchange="updateGeneratedPrompt()" class="accent-indigo-500">
+            <span>Include UFW firewall port rules</span>
+          </label>
+        </div>
+
+        <!-- Live Generated Prompt Output -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between text-slate-400 font-mono text-[11px]">
+            <span>Generated AI Instructions (<span id="prompt-stat-chars">0</span> chars &bull; ~<span id="prompt-stat-tokens">0</span> tokens)</span>
+            <span class="text-emerald-400">&check; Tailored for Claude Code, Cursor, ChatGPT, Antigravity, Aider</span>
+          </div>
+          <textarea
+            id="prompt-output"
+            readonly
+            rows="14"
+            class="w-full p-4 bg-slate-950 border border-slate-800 rounded-xl font-mono text-emerald-400 text-xs leading-relaxed focus:outline-none select-all resize-y shadow-inner"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between gap-3 flex-wrap">
+        <div class="text-slate-400 text-xs">
+          <span>Tip: Click inside to select all, or use <strong>Copy Prompt</strong> below.</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="downloadPromptFile()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            <span>Download prompt.md</span>
+          </button>
+          <button onclick="copyGeneratedPrompt(this)" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-lg transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+            <span>Copy AI Prompt</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- JAVASCRIPT LOGIC & DATABASE -->
   <script>
     const PROJECTS = [
@@ -522,6 +647,7 @@
         catLabel: "📬 Mail Server",
         lang: "go",
         langLabel: "Go",
+        port: 80,
         ram: 35,
         disk: 40,
         cmd: "curl -fsSL https://www.xmox.nl/install.sh | sh && mox quickstart",
@@ -537,6 +663,7 @@
         catLabel: "📬 Mail Server",
         lang: "rust",
         langLabel: "Rust",
+        port: 8080,
         ram: 65,
         disk: 80,
         cmd: "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/stalwartlabs/mail-server/releases/latest/download/install.sh | sudo sh",
@@ -552,6 +679,7 @@
         catLabel: "📬 Mail Server",
         lang: "go",
         langLabel: "Go",
+        port: 25,
         ram: 18,
         disk: 25,
         cmd: "apt-get install -y chasquid",
@@ -569,6 +697,7 @@
         catLabel: "📖 Synced Book Pages",
         lang: "go",
         langLabel: "Go/Node",
+        port: 3000,
         ram: 18,
         disk: 25,
         cmd: "docker run -d --name kosync -p 3000:3000 -v kosync_data:/app/data ghcr.io/nperez0111/koreader-sync:latest",
@@ -584,6 +713,7 @@
         catLabel: "📚 Synced Calibre Library",
         lang: "python",
         langLabel: "Python",
+        port: 8083,
         ram: 45,
         disk: 120,
         cmd: "docker run -d --name calibre-web -p 8083:8083 -v /calibre:/books -v /config:/config linuxserver/calibre-web:latest",
@@ -599,6 +729,7 @@
         catLabel: "🔑 Password Sync",
         lang: "rust",
         langLabel: "Rust",
+        port: 8080,
         ram: 28,
         disk: 85,
         cmd: "docker run -d --name vaultwarden -v /vw-data/:/data/ -p 8080:80 vaultwarden/server:latest",
@@ -614,6 +745,7 @@
         catLabel: "🔑 Device Sync",
         lang: "go",
         langLabel: "Go",
+        port: 8384,
         ram: 55,
         disk: 30,
         cmd: "docker run -d --name syncthing -p 8384:8384 -p 22000:22000/tcp syncthing/syncthing",
@@ -629,6 +761,7 @@
         catLabel: "🎬 Synced Video Watch State",
         lang: "python",
         langLabel: "PHP/SQLite",
+        port: 8080,
         ram: 42,
         disk: 65,
         cmd: "docker run -d --name watchstate -p 8080:8080 -v /config:/config arabcoders/watchstate:latest",
@@ -646,6 +779,7 @@
         catLabel: "🔊 Synced Audio",
         lang: "c",
         langLabel: "C++",
+        port: 1780,
         ram: 14,
         disk: 18,
         cmd: "docker run -d --name snapserver -p 1704:1704 -p 1705:1705 -p 1780:1780 badaix/snapserver:latest",
@@ -661,6 +795,7 @@
         catLabel: "🎬 Synced Video",
         lang: "python",
         langLabel: "Python",
+        port: 8999,
         ram: 12,
         disk: 15,
         cmd: "docker run -d --name syncplay -p 8999:8999 dnomd343/syncplay:latest",
@@ -676,6 +811,7 @@
         catLabel: "⚡ Music Streaming",
         lang: "go",
         langLabel: "Go",
+        port: 4533,
         ram: 42,
         disk: 35,
         cmd: "docker run -d --name navidrome -p 4533:4533 -v /music:/music:ro -v /data:/data deluan/navidrome:latest",
@@ -691,6 +827,7 @@
         catLabel: "⚡ Audiobooks",
         lang: "node",
         langLabel: "Node",
+        port: 13378,
         ram: 85,
         disk: 120,
         cmd: "docker run -d --name audiobookshelf -p 13378:80 -v /audiobooks:/audiobooks -v /config:/config ghcr.io/advplyr/audiobookshelf:latest",
@@ -708,6 +845,7 @@
         catLabel: "🐙 Git Webserver",
         lang: "c",
         langLabel: "C",
+        port: 80,
         ram: 5,
         disk: 8,
         cmd: "docker run -d --name cgit -p 80:80 -v /repos:/var/git ghcr.io/theasp/cgit:latest",
@@ -723,6 +861,7 @@
         catLabel: "👥 Team & Git",
         lang: "go",
         langLabel: "Go",
+        port: 3000,
         ram: 68,
         disk: 110,
         cmd: "docker run -d --name forgejo -p 3000:3000 -p 222:22 -v /data:/data codeberg.org/forgejo/forgejo:latest",
@@ -738,6 +877,7 @@
         catLabel: "👥 Team & Git",
         lang: "go",
         langLabel: "Go",
+        port: 23231,
         ram: 15,
         disk: 25,
         cmd: "docker run -d -p 23231:23231 -v soft-serve:/charm/data charmcli/soft-serve",
@@ -753,6 +893,7 @@
         catLabel: "👥 Team & Git",
         lang: "go",
         langLabel: "Go",
+        port: 10080,
         ram: 38,
         disk: 45,
         cmd: "docker run -d --name=gogs -p 10022:22 -p 10080:3000 -v /var/gogs:/data gogs/gogs",
@@ -770,6 +911,7 @@
         catLabel: "🛡️ Encrypted DNS",
         lang: "go",
         langLabel: "Go",
+        port: 53,
         ram: 25,
         disk: 30,
         cmd: "docker run -d --name dnscrypt-proxy -p 53:53/udp -p 53:53/tcp klutchell/dnscrypt-proxy:latest",
@@ -785,6 +927,7 @@
         catLabel: "🛡️ Encrypted DNS",
         lang: "go",
         langLabel: "Go",
+        port: 3000,
         ram: 35,
         disk: 40,
         cmd: "docker run -d --name adguardhome -p 53:53/tcp -p 53:53/udp -p 3000:3000/tcp adguard/adguardhome:latest",
@@ -800,6 +943,7 @@
         catLabel: "⚡ Private Mesh",
         lang: "go",
         langLabel: "Go",
+        port: 8080,
         ram: 28,
         disk: 30,
         cmd: "docker run -d --name headscale -p 8080:8080 -v /etc/headscale:/etc/headscale headscale/headscale:latest headscale serve",
@@ -815,6 +959,7 @@
         catLabel: "⚡ WireGuard VPN",
         lang: "c",
         langLabel: "WireGuard/Go",
+        port: 51821,
         ram: 32,
         disk: 60,
         cmd: "docker run -d --name wg-easy -e WG_HOST=YOUR_IP -p 51820:51820/udp -p 51821:51821/tcp -v ~/.wg-easy:/etc/wireguard --cap-add=NET_ADMIN ghcr.io/wg-easy/wg-easy",
@@ -832,6 +977,7 @@
         catLabel: "⚡ Seedbox",
         lang: "c",
         langLabel: "C",
+        port: 9091,
         ram: 28,
         disk: 35,
         cmd: "docker run -d --name transmission -p 9091:9091 -p 51413:51413 -v /data:/data linuxserver/transmission:latest",
@@ -847,6 +993,7 @@
         catLabel: "⚡ Seedbox / Downloader",
         lang: "c",
         langLabel: "C++",
+        port: 6888,
         ram: 16,
         disk: 22,
         cmd: "docker run -d --name aria2-pro -p 6800:6800 -p 6888:80 -v /downloads:/downloads p3terx/aria2-pro:latest",
@@ -862,6 +1009,7 @@
         catLabel: "📱 File Transfer",
         lang: "rust",
         langLabel: "Rust",
+        port: 5000,
         ram: 12,
         disk: 15,
         cmd: "docker run -v $(pwd):/data -p 5000:5000 sigoden/dufs /data -A",
@@ -877,6 +1025,7 @@
         catLabel: "📱 File Transfer",
         lang: "go",
         langLabel: "Go",
+        port: 8080,
         ram: 22,
         disk: 35,
         cmd: "curl -fsSL https://raw.githubusercontent.com/filebrowser/get/master/get.sh | bash && filebrowser",
@@ -892,6 +1041,7 @@
         catLabel: "📱 File Transfer",
         lang: "node",
         langLabel: "Node/JS",
+        port: 80,
         ram: 35,
         disk: 50,
         cmd: "npx hfs",
@@ -907,6 +1057,7 @@
         catLabel: "📱 File Transfer",
         lang: "go",
         langLabel: "Go",
+        port: 8080,
         ram: 45,
         disk: 60,
         cmd: "docker run --name sftpgo -p 8080:8080 -p 2022:2022 -d drakkan/sftpgo",
@@ -924,6 +1075,7 @@
         catLabel: "🌐 Web Mirroring",
         lang: "python",
         langLabel: "Python",
+        port: 8080,
         ram: 35,
         disk: 45,
         cmd: "docker run -d --name pywb -p 8080:8080 -v /archive:/webarchive webrecorder/pywb:latest",
@@ -939,6 +1091,7 @@
         catLabel: "🌐 Web Mirroring CLI",
         lang: "rust",
         langLabel: "Rust",
+        port: 0,
         ram: 8,
         disk: 12,
         cmd: "cargo install monolith",
@@ -954,6 +1107,7 @@
         catLabel: "🛡️ Off-Machine Backup",
         lang: "go",
         langLabel: "Go",
+        port: 0,
         ram: 30,
         disk: 28,
         cmd: "apt-get install -y restic",
@@ -969,6 +1123,7 @@
         catLabel: "🛡️ Off-Machine Backup",
         lang: "rust",
         langLabel: "Rust",
+        port: 3900,
         ram: 38,
         disk: 35,
         cmd: "docker run -d -p 3900:3900 -v /garage:/var/lib/garage dxflrs/garage:latest",
@@ -986,6 +1141,7 @@
         catLabel: "⚙️ Distcc Compile Daemon",
         lang: "c",
         langLabel: "C",
+        port: 3632,
         ram: 10,
         disk: 6,
         cmd: "apt-get install -y distcc && distccd --daemon --allow 0.0.0.0/0",
@@ -1001,6 +1157,7 @@
         catLabel: "🔗 Shortlink Host",
         lang: "python",
         langLabel: "PHP/SQLite",
+        port: 8080,
         ram: 38,
         disk: 55,
         cmd: "docker run -d --name shlink -p 8080:8080 -e DEFAULT_DOMAIN=s.local -e IS_HTTPS_ENABLED=false shlinkio/shlink:stable",
@@ -1016,6 +1173,7 @@
         catLabel: "⚡ Chat / Matrix",
         lang: "rust",
         langLabel: "Rust",
+        port: 6167,
         ram: 32,
         disk: 30,
         cmd: "docker run -d -p 6167:6167 -v conduit-data:/var/lib/matrix-conduit matrixconduit/matrix-conduit:latest",
@@ -1031,6 +1189,7 @@
         catLabel: "⚡ Knowledge & Notes",
         lang: "go",
         langLabel: "Go",
+        port: 5230,
         ram: 35,
         disk: 45,
         cmd: "docker run -d --name memos -p 5230:5230 -v ~/.memos/:/var/opt/memos neosmemo/memos:latest",
@@ -1046,6 +1205,7 @@
         catLabel: "⚡ PKM Notes",
         lang: "node",
         langLabel: "Deno/TS",
+        port: 3000,
         ram: 42,
         disk: 60,
         cmd: "docker run -d -p 3000:3000 -v /space:/space zefhemel/silverbullet",
@@ -1061,6 +1221,7 @@
         catLabel: "⚡ Flat Notes",
         lang: "python",
         langLabel: "Python",
+        port: 8080,
         ram: 22,
         disk: 40,
         cmd: "docker run -d -p 8080:8080 -v /notes:/data/notes dullage/flatnotes:latest",
@@ -1076,6 +1237,7 @@
         catLabel: "⚡ RSS Reader",
         lang: "python",
         langLabel: "PHP/SQLite",
+        port: 8080,
         ram: 35,
         disk: 50,
         cmd: "docker run -d --name freshrss -p 8080:80 -v freshrss_data:/var/www/FreshRSS/data freshrss/freshrss",
@@ -1091,6 +1253,7 @@
         catLabel: "⚡ RSS Reader",
         lang: "go",
         langLabel: "Go",
+        port: 8080,
         ram: 25,
         disk: 25,
         cmd: "docker run -d -p 8080:8080 miniflux/miniflux:latest",
@@ -1106,6 +1269,7 @@
         catLabel: "⚡ Bookmarks",
         lang: "python",
         langLabel: "Python",
+        port: 9090,
         ram: 52,
         disk: 75,
         cmd: "docker run -d --name linkding -p 9090:9090 -v linkding_data:/etc/linkding/data sissbruecker/linkding:latest",
@@ -1121,6 +1285,7 @@
         catLabel: "⚡ Bookmarks",
         lang: "go",
         langLabel: "Go",
+        port: 8080,
         ram: 18,
         disk: 25,
         cmd: "docker run -d -p 8080:8080 -v /shiori:/shiori go-shiori/shiori",
@@ -1136,6 +1301,7 @@
         catLabel: "⚡ Monitoring",
         lang: "go",
         langLabel: "Go/PocketBase",
+        port: 8090,
         ram: 18,
         disk: 35,
         cmd: "docker run -d --name beszel -p 8090:8090 -v beszel_data:/pocketbase/pb_data henrygd/beszel:latest",
@@ -1151,6 +1317,7 @@
         catLabel: "⚡ Monitoring",
         lang: "c",
         langLabel: "Python/C",
+        port: 61208,
         ram: 30,
         disk: 20,
         cmd: "curl -L https://bit.ly/glances | /bin/bash",
@@ -1166,6 +1333,7 @@
         catLabel: "⚡ Backend BaaS",
         lang: "go",
         langLabel: "Go",
+        port: 8090,
         ram: 15,
         disk: 35,
         cmd: "curl -fsSL https://pocketbase.io/download/ | tar -xz && ./pocketbase serve",
@@ -1474,6 +1642,147 @@
 
     function escapeQuotes(str) {
       return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // AI PROMPT MODAL LOGIC
+    function openPromptModal(defaultScope = 'bundle') {
+      const modal = document.getElementById('prompt-modal');
+      const scopeSelect = document.getElementById('prompt-scope');
+      
+      // If bundle is empty and 'bundle' was requested, default to filtered or all
+      if (defaultScope === 'bundle' && selectedBundle.size === 0) {
+        defaultScope = getFilteredProjects().length < PROJECTS.length ? 'filtered' : 'all';
+      }
+      scopeSelect.value = defaultScope;
+
+      modal.classList.remove('hidden');
+      updateGeneratedPrompt();
+    }
+
+    function closePromptModal() {
+      const modal = document.getElementById('prompt-modal');
+      modal.classList.add('hidden');
+    }
+
+    // Close on backdrop or escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePromptModal();
+    });
+
+    function getServicesForPrompt(scope) {
+      if (scope === 'bundle') {
+        const list = PROJECTS.filter(p => selectedBundle.has(p.id));
+        return list.length > 0 ? list : getFilteredProjects();
+      } else if (scope === 'filtered') {
+        return getFilteredProjects();
+      } else {
+        return PROJECTS;
+      }
+    }
+
+    function updateGeneratedPrompt() {
+      const scope = document.getElementById('prompt-scope').value;
+      const os = document.getElementById('prompt-os').value;
+      const flavor = document.getElementById('prompt-flavor').value;
+      const optHealth = document.getElementById('prompt-opt-health').checked;
+      const optProxy = document.getElementById('prompt-opt-proxy').checked;
+      const optFirewall = document.getElementById('prompt-opt-firewall').checked;
+
+      const services = getServicesForPrompt(scope);
+      const totalRam = services.reduce((sum, p) => sum + p.ram, 0);
+      const totalDisk = services.reduce((sum, p) => sum + p.disk, 0);
+
+      document.getElementById('prompt-modal-service-count').textContent = `${services.length} Services (${totalRam} MB RAM)`;
+
+      let prompt = `# AI AGENT DIRECTIVE: Autonomous Deployment of Self-Locally Stack\n\n`;
+      prompt += `You are an expert autonomous Linux systems engineer, DevOps architect, and security administrator.\n`;
+      prompt += `Your task is to deploy, configure, and verify the following ultra-lean self-hosted services on a fresh **${os}** environment.\n\n`;
+
+      prompt += `## 1. Architectural Constraints (RecentlyWritten.com Benchmark)\n`;
+      prompt += `Adhere strictly to these four rules throughout this deployment:\n`;
+      prompt += `1. **1-Command per Service**: Every service must be launched with its exact verified one-liner.\n`;
+      prompt += `2. **Low Resource Footprint**: Total combined RAM for these ${services.length} services is estimated at **~${totalRam} MB** (stays strictly within <= 1 GB VPS capacity). Disk footprint is **~${totalDisk} MB** (<= 8 GB).\n`;
+      prompt += `3. **Zero Configuration Files**: Do NOT introduce heavyweight external databases (PostgreSQL, MySQL, Redis, JVM stacks). Use embedded SQLite and internal storage.\n`;
+      prompt += `4. **Strict Isolation**: Keep persistent state neatly isolated in \`/opt/self-locally/<service-id>/\`.\n\n`;
+
+      prompt += `## 2. Target Services Manifest (${services.length} Verified Services)\n\n`;
+      services.forEach((s, idx) => {
+        prompt += `### ${idx + 1}. ${s.name} (${s.catLabel})\n`;
+        prompt += `- **Runtime**: ${s.langLabel} | **Expected RAM**: ~${s.ram} MB | **Disk Overhead**: ~${s.disk} MB\n`;
+        prompt += `- **Zero-Config Rationale**: ${s.zeroConfig}\n`;
+        prompt += `- **Repository / Docs**: ${s.repo}\n`;
+        if (s.port > 0) prompt += `- **Default Port**: \`${s.port}\`\n`;
+        prompt += `- **Deploy Command**:\n\`\`\`bash\n${s.cmd}\n\`\`\`\n\n`;
+      });
+
+      prompt += `## 3. Step-by-Step Execution Protocol for the AI Agent\n\n`;
+      prompt += `1. **Pre-flight Check**: Check current memory and disk space (\`free -m\`, \`df -h\`). Ensure Docker/podman or native package managers are installed.\n`;
+      prompt += `2. **Directory Provisioning**: Create directory tree:\n`;
+      prompt += `   \`\`\`bash\n   mkdir -p /opt/self-locally/{${services.map(s => s.id).join(',')}}\n   \`\`\`\n`;
+
+      if (optFirewall) {
+        const ports = services.filter(s => s.port > 0).map(s => s.port);
+        prompt += `3. **Firewall Setup (UFW)**:\n`;
+        prompt += `   \`\`\`bash\n   ufw allow 22/tcp\n   ${ports.map(p => `ufw allow ${p}/tcp`).join('\n   ')}\n   \`\`\`\n`;
+      }
+
+      prompt += `4. **Service Execution**: Execute each deployment command listed in Section 2 sequentially. Ensure all containers run with \`--restart unless-stopped\`.\n`;
+
+      if (optHealth) {
+        prompt += `5. **Automated Health Verification**:\n`;
+        prompt += `   Run health checks for each service to confirm HTTP 200/302 responses or active daemon state:\n`;
+        prompt += `   \`\`\`bash\n`;
+        services.filter(s => s.port > 0).forEach(s => {
+          prompt += `   curl -fsSL -o /dev/null -w "%{http_code}" http://localhost:${s.port} || echo "${s.name} pending"\n`;
+        });
+        prompt += `   \`\`\`\n`;
+      }
+
+      if (optProxy) {
+        prompt += `6. **Optional Auto-TLS Reverse Proxy (Caddy)**:\n`;
+        prompt += `   If a domain is pointed to this server, expose these services using a minimal Caddyfile with automatic Let's Encrypt certificates:\n`;
+        prompt += `   \`\`\`caddyfile\n`;
+        services.filter(s => s.port > 0).slice(0, 8).forEach(s => {
+          prompt += `   ${s.id}.yourdomain.com {\n       reverse_proxy localhost:${s.port}\n   }\n`;
+        });
+        prompt += `   \`\`\`\n`;
+      }
+
+      prompt += `7. **Final Deliverable**:\n`;
+      prompt += `   Output a clean summary table listing: Service Name, Access URL, Active RSS Memory (\`docker stats --no-stream\`), and default initial credentials.\n`;
+
+      const outputEl = document.getElementById('prompt-output');
+      outputEl.value = prompt;
+
+      // Stats
+      document.getElementById('prompt-stat-chars').textContent = prompt.length.toLocaleString();
+      document.getElementById('prompt-stat-tokens').textContent = Math.round(prompt.length / 4).toLocaleString();
+    }
+
+    function copyGeneratedPrompt(btn) {
+      const promptText = document.getElementById('prompt-output').value;
+      navigator.clipboard.writeText(promptText).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = `<span>&check; Copied Prompt!</span>`;
+        btn.classList.add("bg-emerald-600");
+        setTimeout(() => {
+          btn.innerHTML = orig;
+          btn.classList.remove("bg-emerald-600");
+        }, 1800);
+      });
+    }
+
+    function downloadPromptFile() {
+      const promptText = document.getElementById('prompt-output').value;
+      const blob = new Blob([promptText], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'self-locally-ai-prompt.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
     function runGrader() {
