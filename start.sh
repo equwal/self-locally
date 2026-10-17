@@ -32,18 +32,18 @@ docker run -d \
   gogs/gogs:latest
 
 echo "==> [4/4] Launching dnscrypt-proxy (Encrypted + cached DNS, ~25 MB RAM)..."
-# If host port 53 is occupied by systemd-resolved or local nameserver, use -p 5053:53
-DNS_PORT="53"
+# Maps host DNS port (53 or fallback 5053) to container's internal port 5053
+HOST_DNS_PORT="53"
 if ss -tuln | grep -q ':53 '; then
-  echo "    Port 53 occupied on host. Mapping dnscrypt-proxy to 5053."
-  DNS_PORT="5053"
+  echo "    Port 53 occupied on host. Mapping dnscrypt-proxy to 5053 on host."
+  HOST_DNS_PORT="5053"
 fi
 
 docker run -d \
   --name dnscrypt-proxy \
   --restart unless-stopped \
-  -p "${DNS_PORT}:53/udp" \
-  -p "${DNS_PORT}:53/tcp" \
+  -p "${HOST_DNS_PORT}:5053/udp" \
+  -p "${HOST_DNS_PORT}:5053/tcp" \
   klutchell/dnscrypt-proxy:latest
 
 echo "==> All 4 services running successfully! Memory footprint check:"
