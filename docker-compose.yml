@@ -1,0 +1,60 @@
+# Self-Locally: Lean 4-Service Core Stack (119 MB RAM Total)
+# Criteria: 1-command install, <=8GB disk, <=1GB RAM, zero manual configuration.
+# Services:
+#   1. kosync          (KOReader Sync Server, ~18 MB RAM)
+#   2. shlink          (URL Shortener & Analytics, ~38 MB RAM)
+#   3. gogs            (Git Forge & Repository Host, ~38 MB RAM)
+#   4. dnscrypt-proxy  (Encrypted + Cached DNS Server, ~25 MB RAM)
+
+services:
+  # 1. KOReader Sync Server (Synced Book Pages)
+  kosync:
+    image: ghcr.io/nperez0111/koreader-sync:latest
+    container_name: kosync
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - kosync_data:/app/data
+    environment:
+      - PORT=3000
+
+  # 2. Shlink URL Shortener (Shortlink Host)
+  shlink:
+    image: shlinkio/shlink:stable
+    container_name: shlink
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - shlink_data:/etc/shlink/data
+    environment:
+      - DEFAULT_DOMAIN=localhost:8080
+      - IS_HTTPS_ENABLED=false
+      - DB_DRIVER=sqlite
+
+  # 3. Gogs (Lightweight Git Server)
+  gogs:
+    image: gogs/gogs:latest
+    container_name: gogs
+    restart: unless-stopped
+    ports:
+      - "10080:3000"
+      - "10022:22"
+    volumes:
+      - gogs_data:/data
+
+  # 4. dnscrypt-proxy (Encrypted + Cached DNS)
+  dnscrypt-proxy:
+    image: klutchell/dnscrypt-proxy:latest
+    container_name: dnscrypt-proxy
+    restart: unless-stopped
+    ports:
+      # If port 53 is already taken on host, change to "5053:53/udp" & "5053:53/tcp"
+      - "53:53/udp"
+      - "53:53/tcp"
+
+volumes:
+  kosync_data:
+  shlink_data:
+  gogs_data:
