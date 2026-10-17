@@ -6,6 +6,8 @@
 #   3. gogs            (Git Forge & Repository Host, ~38 MB RAM)
 #   4. dnscrypt-proxy  (Encrypted + Cached DNS Server, ~25 MB RAM)
 
+version: '3.8'
+
 services:
   # 1. KOReader Sync Server (Synced Book Pages)
   kosync:
