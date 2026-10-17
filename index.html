@@ -315,6 +315,9 @@
         <!-- Preset buttons -->
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-xs text-slate-400 font-mono">Presets:</span>
+          <button onclick="applyPreset('rw_stack')" class="px-2.5 py-1 text-xs bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 rounded border border-emerald-700/60 transition font-medium">
+            ★ KOReader + Shlink + Gogs + DNS
+          </button>
           <button onclick="applyPreset('reader_media')" class="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-700 transition">
             Books + Media Sync
           </button>
@@ -1552,7 +1555,12 @@
 
     function applyPreset(preset) {
       selectedBundle.clear();
-      if (preset === 'reader_media') {
+      if (preset === 'rw_stack') {
+        selectedBundle.add('kosync');
+        selectedBundle.add('shlink');
+        selectedBundle.add('gogs');
+        selectedBundle.add('dnscrypt');
+      } else if (preset === 'reader_media') {
         selectedBundle.add('kosync');
         selectedBundle.add('calibreweb');
         selectedBundle.add('audiobookshelf');
